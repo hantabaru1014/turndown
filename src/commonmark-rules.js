@@ -5,8 +5,13 @@ var rules = {}
 rules.paragraph = {
   filter: 'p',
 
-  replacement: function (content) {
-    return '\n\n' + content + '\n\n'
+  replacement: function (content, node) {
+    // return '\n\n' + content + '\n\n'
+    if (node.nextSibling && node.nextSibling.nodeName === 'P'){
+      return content + '  \n'
+    }else{
+      return content
+    }
   }
 }
 
@@ -14,7 +19,7 @@ rules.lineBreak = {
   filter: 'br',
 
   replacement: function (content, node, options) {
-    return options.br + '\n'
+    return options.br + '\n\n'
   }
 }
 
@@ -49,12 +54,7 @@ rules.list = {
   filter: ['ul', 'ol'],
 
   replacement: function (content, node) {
-    var parent = node.parentNode
-    if (parent.nodeName === 'LI' && parent.lastElementChild === node) {
-      return '\n' + content
-    } else {
-      return '\n\n' + content + '\n\n'
-    }
+    return '\n' + content + (node.parentNode.nodeName === 'LI' || (node.nextSibling && node.nextSibling.nodeName === 'BR') ? '' : '\n')
   }
 }
 
@@ -66,7 +66,7 @@ rules.listItem = {
       .replace(/^\n+/, '') // remove leading newlines
       .replace(/\n+$/, '\n') // replace trailing newlines with just a single one
       .replace(/\n/gm, '\n    ') // indent
-    var prefix = options.bulletListMarker + '   '
+    var prefix = options.bulletListMarker + ' '
     var parent = node.parentNode
     if (parent.nodeName === 'OL') {
       var start = parent.getAttribute('start')
@@ -221,6 +221,29 @@ rules.strong = {
   replacement: function (content, node, options) {
     if (!content.trim()) return ''
     return options.strongDelimiter + content + options.strongDelimiter
+  }
+}
+
+rules.spanWithDecoration = {
+  filter: 'span',
+
+  replacement: function (content, node, options) {
+    // 斜体
+    if (node.style.hasOwnProperty('font-style') && node.style['font-style'] === 'italic'){
+      if (!content.trim()) return ''
+      return options.emDelimiter + content + options.emDelimiter
+    }
+    // 下線
+    if (node.style.hasOwnProperty('text-decoration-line') && node.style['text-decoration-line'] === 'underline'){
+      if (!content.trim()) return ''
+      return options.startUnderline + content + options.endUnderline
+    }
+    // 太字
+    if (node.style.hasOwnProperty('font-weight') && node.style['font-weight'] === '700'){
+      if (!content.trim()) return ''
+      return options.strongDelimiter + content + options.strongDelimiter
+    }
+    return content
   }
 }
 

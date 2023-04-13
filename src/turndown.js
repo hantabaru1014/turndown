@@ -25,10 +25,10 @@ export default function TurndownService (options) {
 
   var defaults = {
     rules: COMMONMARK_RULES,
-    headingStyle: 'setext',
-    hr: '* * *',
-    bulletListMarker: '*',
-    codeBlockStyle: 'indented',
+    headingStyle: 'atx',
+    hr: '---',
+    bulletListMarker: '-',
+    codeBlockStyle: 'fenced',
     fence: '```',
     emDelimiter: '_',
     strongDelimiter: '**',
@@ -36,6 +36,8 @@ export default function TurndownService (options) {
     linkReferenceStyle: 'full',
     br: '  ',
     preformattedCode: false,
+    startUnderline: '<u>',
+    endUnderline: '</u>',
     blankReplacement: function (content, node) {
       return node.isBlock ? '\n\n' : ''
     },
